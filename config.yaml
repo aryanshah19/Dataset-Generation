@@ -1,0 +1,14 @@
+parameters:
+  - PROJECT_PATH: "/Users/aryan/Desktop/fd_dataset_creation/Yolov5/"
+  - image_input_folder: "batch2"
+  - image_output_folder: "testimages"
+  - annotations_input_folder: "new_annotations"
+  - annotations_output_folder: "testannotations"
+  - positionlist: ["centre","random"]
+  - fliplist: ["True","False"]
+  - angle_boundaries: [45,90]
+  - transformation: "sharpness"
+  - color: "yellow"
+  - augmented_output_folder: "augmented_images"
+  - background: "/Users/aryan/Desktop/fd_dataset_creation/Yolov5/back2.jpeg"
+  
