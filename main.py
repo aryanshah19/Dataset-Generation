@@ -90,6 +90,12 @@ class DatasetGeneration:
         angle_boundaries = self.angle_boundaries
         background = self.background
         number_of_images = 5
+        countangle = 0
+        counttest = 0
+        for i in range(angle_boundaries[0],angle_boundaries[1]):
+            if i%15 == 0:
+                countangle = countangle + 1
+        totalimages = number_of_images*len(positionlist) * len(fliplist) * countangle
         """
            Generate augmented images
 
@@ -114,7 +120,7 @@ class DatasetGeneration:
                                "bottomleft": "bole",
                                "bottomright": "bori",
                                "random": "rand"}
-        print("Generating images.....!\n\n")
+        print("Generating", totalimages, "images.....!\n\n")
         image_input_path = PROJECT_PATH + image_input_folder
 
         q = 0
@@ -136,8 +142,10 @@ class DatasetGeneration:
 
                                 uniquename = str(filepath[-10:-4]) + "_" + str(angle) + "_" + str(
                                     position_shortnames[position]) + "_" + str(flip[0])
-                                print("Generating",str(filepath[-10:-4]),"rotated by an angle of",
+                                stringangle = "["+ str(counttest + 1) +"/10"+"] "
+                                print(stringangle,"Generating",str(filepath[-10:-4]),"rotated by an angle of",
                                       angle, "positioned at",position+".")
+                                counttest = counttest + 1
                                 image_output_path = image_output_path + uniquename + ".png"
                                 annotations_output_path = annotations_output_path + uniquename + ".txt"
 
