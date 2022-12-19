@@ -5,8 +5,8 @@ parameters:
   - annotations_input_folder: "new_annotations"
   - annotations_output_folder: "testannotations"
   - positionlist: ["centre","random"]
-  - fliplist: ["True","False"]
-  - angle_boundaries: [45,90]
+  - fliplist: ["True"]
+  - angle_boundaries: [45,60]
   - transformation: "sharpness"
   - color: "yellow"
   - augmented_output_folder: "augmented_images"

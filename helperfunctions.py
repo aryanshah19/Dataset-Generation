@@ -1,39 +1,11 @@
-import math
 import PIL
 from PIL import Image, ImageEnhance, ImageFilter
+import math
+import random
 import matplotlib.image as mpimg
 import matplotlib.pyplot as plt
-import random
-import os
 import wand
 import cv2
-import yaml
-
-with open("config.yaml", "r") as stream:
-    try:
-        string = yaml.safe_load(stream)
-    except yaml.YAMLError as exc:
-        print(exc)
-
-data = {}
-for i in string["parameters"]:
-    value = list(i.keys())[0]
-    keys = list(i.values())[0]
-    data[value] = keys
-
-PROJECT_PATH = data["PROJECT_PATH"]
-image_input_folder = data["image_input_folder"]
-image_output_folder = data["image_output_folder"]
-annotations_input_folder = data["annotations_input_folder"]
-annotations_output_folder = data["annotations_output_folder"]
-positionlist = data["positionlist"]
-fliplist = data["fliplist"]
-angle_boundaries = data["angle_boundaries"]
-transformation = data["transformation"]
-color = data["color"]
-augmented_output_folder = data["augmented_output_folder"]
-background = data["background"]
-
 
 def rotate(origin, point, angle):
     """
@@ -230,89 +202,18 @@ def plot_image(imagepath, annotationspath_):
 
 
 def rename_files(PROJECT_PATH,
-                 foldername):
+                 foldername
+                 ):
     folder_path = PROJECT_PATH + str(foldername)
     for filepath in os.listdir(folder_path):
         old_path = folder_path + "/" + str(filepath)
         new_path = folder_path + "/" + str(filepath[0:6]) + ".png"
         os.rename(old_path, new_path)
 
-
-def generate_images(PROJECT_PATH = PROJECT_PATH,
-                    image_input_folder = image_input_folder,
-                    image_output_folder = image_output_folder,
-                    annotations_input_folder = annotations_input_folder,
-                    annotations_output_folder = annotations_output_folder,
-                    positionlist = positionlist,
-                    fliplist = fliplist,
-                    angle_boundaries = angle_boundaries,
-                    background = background,
-                    number_of_images=5
-                    ):
-    """
-       Generate augmented images
-
-                Arguments:
-                    PROJECT_PATH
-                    image_input_folder,
-                    image_output_folder,
-                    annotations_input_folder,
-                    annotations_output_folder,
-                    positionlist - The list of positions
-                    fliplist - The list of flips to be done {True, False}
-                    angle_boundaries - List of lower bounds and upper
-                                        bounds in angle in the form of a tuple
-                    background - the background image
-                    number_of_images - For testing purposes
-                Returns:
-                    Saves the images and annotations to the designated folders
-            """
-    position_shortnames = {"centre": "cent",
-                           "topleft": "tole",
-                           "topright": "tori",
-                           "bottomleft": "bole",
-                           "bottomright": "bori",
-                           "random": "rand"}
-
-    image_input_path = PROJECT_PATH + str(image_input_folder)
-
-    q = 0
-    for filepath in sorted(os.listdir(image_input_path)):
-
-        if q != number_of_images:
-
-            foreground = image_input_path + "/" + str(filepath)
-            old_annotations_path = PROJECT_PATH + str(annotations_input_folder) + "/" + filepath[-10:-4] + ".txt"
-
-            if filepath[-4:] == ".png":
-                q = q + 1
-                for angle in range(angle_boundaries[0], angle_boundaries[1], 15):
-                    for position in positionlist:
-                        for flip in fliplist:
-                            image_output_path = PROJECT_PATH + str(image_output_folder) + "/"
-                            annotations_output_path = PROJECT_PATH + str(annotations_output_folder) + "/"
-
-                            uniquename = str(filepath[-10:-4]) + "_" + str(angle) + "_" + str(
-                                position_shortnames[position]) + "_" + str(flip[0])
-
-                            image_output_path = image_output_path + uniquename + ".png"
-                            annotations_output_path = annotations_output_path + uniquename + ".txt"
-
-                            paste_image(foreground,
-                                        background,
-                                        position,
-                                        angle,
-                                        old_annotations_path,
-                                        annotations_output_path,
-                                        image_output_path,
-                                        flip=flip)
-
-
 def inject_noise(filename, dest):
     with wand.image.Image(filename=filename) as img:
         img.noise("poisson", attenuate=0.99)
         img.save(filename=dest)
-
 
 def color_transformation(filename, dest, color):
     if color == "yellow":
@@ -328,13 +229,11 @@ def color_transformation(filename, dest, color):
         nemo[..., 2] = 0
         cv2.imwrite(dest, nemo)
 
-
 def brighten_image(filename, dest):
     im = PIL.Image.open(filename)
     im = ImageEnhance.Brightness(im)
     im = im.enhance(2.0)
     im.save(dest)
-
 
 def contrast_image(filename, dest):
     im = PIL.Image.open(filename)
@@ -342,86 +241,13 @@ def contrast_image(filename, dest):
     im = im.enhance(2.0)
     im.save(dest)
 
-
 def sharpen_image(filename, dest):
     im = PIL.Image.open(filename)
     im = ImageEnhance.Sharpness(im)
     im = im.enhance(2.0)
     im.save(dest)
 
-
 def blur_image(filename, dest):
     im = PIL.Image.open(filename)
     im = im.filter(ImageFilter.BLUR)
     im.save(dest)
-
-
-def augment_images(PROJECT_PATH,
-                   image_input_folder,
-                   image_output_folder,
-                   transformation,
-                   color=None
-                   ):
-
-    """
-       Augment images with noise, blur, sharpening and contrasting
-
-                Arguments:
-                    PROJECT_PATH,
-                   image_input_folder,
-                   image_output_folder,
-                   transformation - list of transformations
-                   color - list of colors
-                Returns:
-                    Saves the images and annotations to the designated folders
-     """
-
-    image_input_path = PROJECT_PATH + str(image_input_folder)
-    image_output_path = PROJECT_PATH + str(image_output_folder)
-    # print(image_output_path)
-    for filepath in sorted(os.listdir(image_input_path)):
-        if filepath[-4:] == ".png":
-            image_path = image_input_path + "/" + str(filepath)
-
-            if transformation == "noise":
-                output_path = image_output_path + "/" + str(transformation) + "_" + str(filepath)
-                inject_noise(image_path, output_path)
-
-            if transformation == "color":
-                output_path = image_output_path + "/" + str(color[0]) + "_" + str(filepath)
-                color_transformation(image_path, output_path, color)
-
-            if transformation == "brightness":
-                output_path = image_output_path + "/" + str(transformation[0:4]) + "_" + str(filepath)
-                brighten_image(image_path, output_path)
-
-            if transformation == "contrast":
-                output_path = image_output_path + "/" + str(transformation[0:4]) + "_" + str(filepath)
-                contrast_image(image_path, output_path)
-
-            if transformation == "sharpness":
-                output_path = image_output_path + "/" + str(transformation[0:4]) + "_" + str(filepath)
-                sharpen_image(image_path, output_path)
-
-            if transformation == "blur":
-                output_path = image_output_path + "/" + str(transformation[0:4]) + "_" + str(filepath)
-                blur_image(image_path, output_path)
-
-
-class DatasetGeneration:
-    def __init__(self, projectpath):
-        self.projectpath = projectpath
-
-    def PROJECT_PATH(self):
-        return self.projectpath
-
-
-if __name__ == '__main__':
-    #generate_images(number_of_images=4)
-    file = "im0059_60_rand_T"
-    imagepath = "/Users/aryan/Desktop/fd_dataset_creation/Yolov5/testimages/" + file + ".png"
-    test_anno = "/Users/aryan/Desktop/fd_dataset_creation/Yolov5/testannotations/" + file + ".txt"
-    plot_image(imagepath, test_anno)
-
-
-
