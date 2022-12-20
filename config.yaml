@@ -4,11 +4,11 @@ parameters:
   - image_output_folder: "testimages"
   - annotations_input_folder: "new_annotations"
   - annotations_output_folder: "testannotations"
-  - positionlist: ["bottomright"]
+  - positionlist: ["centre"]
   - fliplist: ["True"]
-  - angle_boundaries: [0,30]
+  - angle_boundaries: [45,61]
   - transformation: "sharpness"
   - color: "yellow"
   - augmented_output_folder: "augmented_images"
-  - background: "/Users/aryan/Desktop/fd_dataset_creation/Yolov5/back2.jpeg"
+  - background: "/Users/aryan/Desktop/Dataset Generation/back1.jpeg"
   

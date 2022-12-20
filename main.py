@@ -95,7 +95,7 @@ class DatasetGeneration:
         for i in range(angle_boundaries[0],angle_boundaries[1]):
             if i%15 == 0:
                 countangle = countangle + 1
-        totalimages = number_of_images*len(positionlist) * len(fliplist) * countangle
+        totalimages = number_of_images * len(positionlist) * len(fliplist) * countangle
         """
            Generate augmented images
 
@@ -142,7 +142,7 @@ class DatasetGeneration:
 
                                 uniquename = str(filepath[-10:-4]) + "_" + str(angle) + "_" + str(
                                     position_shortnames[position]) + "_" + str(flip[0])
-                                stringangle = "["+ str(counttest + 1) +"/10"+"] "
+                                stringangle = "["+ str(counttest + 1) +"/"+str(totalimages)+"] "
                                 print(stringangle,"Generating",str(filepath[-10:-4]),"rotated by an angle of",
                                       angle, "positioned at",position+".")
                                 counttest = counttest + 1
@@ -196,6 +196,8 @@ class DatasetGeneration:
             if filepath[-4:] == ".png":
                 image_path = image_input_path + "/" + str(filepath)
 
+                print("Augmenting", filepath[:6],"by introducing", transformation+".")
+
                 if transformation == "noise":
                     output_path = image_output_path + "/" + str(transformation) + "_" + str(filepath)
                     inject_noise(image_path, output_path)
@@ -233,16 +235,16 @@ if __name__ == '__main__':
     #newtest.printvariables()
 
     ## Generating the dataset
-    newtest.generate_images(number_of_images=5)
+    newtest.generate_images(number_of_images=20)
 
     ## Augmenting the photos
-    newtest.augment_images()
+    #newtest.augment_images()
 
     # Plotting the images to test
-    file = "im0056_15_bori_T"
-    imagepath = "/Users/aryan/Desktop/fd_dataset_creation/Yolov5/testimages/" + file + ".png"
-    test_anno = "/Users/aryan/Desktop/fd_dataset_creation/Yolov5/testannotations/" + file + ".txt"
-    plot_image(imagepath, test_anno)
+    # file = "im0056_15_bori_T"
+    # imagepath = "/Users/aryan/Desktop/fd_dataset_creation/Yolov5/testimages/" + file + ".png"
+    # test_anno = "/Users/aryan/Desktop/fd_dataset_creation/Yolov5/testannotations/" + file + ".txt"
+    # plot_image(imagepath, test_anno)
 
 
 

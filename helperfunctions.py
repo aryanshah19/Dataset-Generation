@@ -7,6 +7,9 @@ import matplotlib.pyplot as plt
 import wand
 import cv2
 
+def compute_diagonal(w,h):
+    return math.sqrt(w**2 + h**2)
+
 def rotate(origin, point, angle):
     """
     Rotate a point counterclockwise by a given angle around a given origin.
@@ -25,6 +28,7 @@ def rotate(origin, point, angle):
 
     qx = ox + math.cos(angle) * (px - ox) - math.sin(angle) * (py - oy)
     qy = oy + math.sin(angle) * (px - ox) + math.cos(angle) * (py - oy)
+
     return qx, qy
 
 
@@ -46,6 +50,7 @@ def add_margin(pil_img,
     top, right, bottom, left = points[0], points[1], points[2], points[3]
     new_width = width + right + left
     new_height = height + top + bottom
+
     result = PIL.Image.new(pil_img.mode, (new_width, new_height), color)
     result.paste(pil_img, (left, top))
     return result
@@ -83,9 +88,16 @@ def paste_image(foreground,
     # for padding the image on top and bottom
     h1 = frontImage.height
     w1 = frontImage.width
-    top = (w1 - h1) // 2
-    bottom = (w1 - h1) // 2
-    frontImage = add_margin(frontImage, [top, 0, bottom, 0], (0, 0, 0, 0))
+
+    d = compute_diagonal(w1, h1)
+
+    top = int((d - h1) // 2)
+    bottom = int((d - h1) // 2)
+    left = int((d - w1) // 2)
+    right = int((d - w1) // 2)
+
+    frontImage = add_margin(frontImage, [top, right, bottom, left], (0, 0, 0, 0))
+
     h1 = frontImage.height
     w1 = frontImage.width
 
@@ -110,7 +122,7 @@ def paste_image(foreground,
     origin = (w1 / 2, h1 / 2)
     for u in range(len(x_cord)):
         ## for offsetting the new padding
-        x_cord[u] = x_cord[u]
+        x_cord[u] = x_cord[u] - right
         y_cord[u] = y_cord[u] + top
 
         ## To bring the y-axis from bottom to top
@@ -134,6 +146,21 @@ def paste_image(foreground,
 
     # Convert image to RGBA
     background = background.convert("RGBA")
+
+    if frontImage.size[0]>background.size[0]:
+        bgheight = background.size[1]
+
+        oldsize = frontImage.size
+        frontImage.thumbnail((bgheight-10, bgheight-10))
+        newsize = frontImage.size
+        print(oldsize,newsize)
+        wratio = newsize[0] / oldsize[0]
+        hratio = newsize[1] / oldsize[1]
+
+        for u in range(len(x_cord)):
+            ## for offsetting the new padding
+            x_cord[u] = x_cord[u]*wratio
+            y_cord[u] = y_cord[u]*hratio
 
     if corner == "bottomright":
         width = (background.width - frontImage.width)
