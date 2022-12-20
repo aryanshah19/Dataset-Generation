@@ -153,7 +153,7 @@ def paste_image(foreground,
         oldsize = frontImage.size
         frontImage.thumbnail((bgheight-10, bgheight-10))
         newsize = frontImage.size
-        print(oldsize,newsize)
+        #print(oldsize,newsize)
         wratio = newsize[0] / oldsize[0]
         hratio = newsize[1] / oldsize[1]
 
