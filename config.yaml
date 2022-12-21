@@ -10,5 +10,5 @@ parameters:
   - transformation: "sharpness"
   - color: "yellow"
   - augmented_output_folder: "augmented_images"
-  - background: "/Users/aryan/Desktop/Dataset Generation/back3.jpeg"
+  - background: "/Users/aryan/Desktop/Wallpapers/marina-lisova-u4PbxAFjVQw-unsplash.jpg"
   
